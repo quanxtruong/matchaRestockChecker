@@ -13,7 +13,7 @@ PRODUCTS_URL = os.getenv("PRODUCTS_URL")
 # CHECK_INTERVAL = 300  # Check every 5 mins (in seconds)
 
 # Gmail SMTP settings
-SMTP_SERVER = "smtp.gmail.com"
+SMTP_SERVER = "smtp.gmail.com" 
 SMTP_PORT = 587
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Gmail App Password
