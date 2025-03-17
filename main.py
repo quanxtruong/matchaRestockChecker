@@ -10,7 +10,7 @@ import os
 load_dotenv()
 
 PRODUCTS_URL = os.getenv("PRODUCTS_URL")
-CHECK_INTERVAL = 300  # Check every 5 mins (in seconds)
+# CHECK_INTERVAL = 300  # Check every 5 mins (in seconds)
 
 # Gmail SMTP settings
 SMTP_SERVER = "smtp.gmail.com"
@@ -132,22 +132,21 @@ def send_sms_alert(product_title, product_url):
 
 
 if __name__ == "__main__":
-    while True:
-        try:
-            current_status = get_stock_status()
-            prev_status = load_previous_status()
+    try:
+        current_status = get_stock_status()
+        prev_status = load_previous_status()
 
-            for title, info in current_status.items():
-                current_avail = info["available"]
-                prev_avail = prev_status.get(title, {}).get("available", False)
+        for title, info in current_status.items():
+            current_avail = info["available"]
+            prev_avail = prev_status.get(title, {}).get("available", False)
 
-                if not prev_avail and current_avail:
-                    send_email_alert(title, info["url"])
-                    send_sms_alert(title, info["url"])
-                else:
-                    print(f"{title} - In stock: {current_avail}")
+            if not prev_avail and current_avail:
+                send_email_alert(title, info["url"])
+                send_sms_alert(title, info["url"])
+            else:
+                print(f"{title} - In stock: {current_avail}")
 
-            save_status(current_status)
-        except Exception as e:
-            print("Error in main loop:", e)
-        time.sleep(CHECK_INTERVAL)
+        save_status(current_status)
+    except Exception as e:
+        print("Error in main loop:", e)
+        # time.sleep(CHECK_INTERVAL)
