@@ -2,29 +2,27 @@ import requests
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
-import time
 import json
-from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 import os
+from dotenv import load_dotenv
 
-# load_dotenv()
+if os.getenv("GITHUB_ACTIONS") != "true":
+    load_dotenv()
 
 IPPUDO_URL = os.getenv("IPPUDO_URL")
 MATCHA_JP_URL = os.getenv("MATCHA_JP_URL")
+SAZEN_URLS = os.getenv("SAZEN_URLS", "").split(",")
 
-# Gmail SMTP settings
 SMTP_SERVER = "smtp.gmail.com" 
 SMTP_PORT = 587
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Gmail App Password
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-# Recipients
-RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")  # e.g., your personal email
-RECIPIENT_SMS = os.getenv("RECIPIENT_SMS")      # e.g., 1234567890@tmomail.net
+RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
+RECIPIENT_SMS = os.getenv("RECIPIENT_SMS")
 
-# File to store previous stock status
 STATUS_FILE = "stock_status.json"
-
 
 def process_stock(url, stock_dict):
     response = requests.get(f"{url}.json")
@@ -39,18 +37,33 @@ def process_stock(url, stock_dict):
             "url": product_url
         }
 
+def process_sazen(stock_dict):
+    for url in SAZEN_URLS:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        unavailable_msg = soup.find("strong", class_="red")
+        quantity_select = soup.find("select", id="quantity")
+        product_title = soup.find("h1").text.strip() if soup.find("h1") else "Sazen Matcha Product"
+        is_available = not unavailable_msg and quantity_select is not None
+        stock_dict[product_title] = {
+            "available": is_available,
+            "url": url
+        }
+
 def get_stock_status():
     stock_dict = {}
     try:
         process_stock(IPPUDO_URL, stock_dict)
     except Exception as e:
         print("Error fetching Ippudo stock data:", e)
-
     try:
         process_stock(MATCHA_JP_URL, stock_dict)
     except Exception as e:
         print("Error fetching MatchaJP stock data:", e)
-
+    try:
+        process_sazen(stock_dict)
+    except Exception as e:
+        print("Error fetching Sazen stock data:", e)
     return stock_dict
 
 def load_previous_status():
@@ -60,14 +73,12 @@ def load_previous_status():
     except FileNotFoundError:
         return {}
 
-
 def save_status(status):
     try:
         with open(STATUS_FILE, 'w') as f:
             json.dump(status, f)
     except Exception as e:
         print("Error saving status:", e)
-
 
 def send_email_alert(product_title, product_url):
     msg = MIMEMultipart("alternative")
@@ -122,7 +133,6 @@ def send_email_alert(product_title, product_url):
     except Exception as e:
         print("Failed to send email:", e)
 
-
 def send_sms_alert(product_title, product_url):
     msg = MIMEText(f"{product_title} is BACK IN STOCK!\nBuy here: {product_url}")
     msg["From"] = EMAIL_ADDRESS
@@ -137,23 +147,18 @@ def send_sms_alert(product_title, product_url):
     except Exception as e:
         print("Failed to send SMS:", e)
 
-
 if __name__ == "__main__":
     try:
         current_status = get_stock_status()
         prev_status = load_previous_status()
-
         for title, info in current_status.items():
             current_avail = info["available"]
             prev_avail = prev_status.get(title, {}).get("available", False)
-
             if not prev_avail and current_avail:
                 send_email_alert(title, info["url"])
                 send_sms_alert(title, info["url"])
             else:
                 print(f"{title} - In stock: {current_avail}")
-
         save_status(current_status)
     except Exception as e:
         print("Error in main loop:", e)
-        # time.sleep(CHECK_INTERVAL)

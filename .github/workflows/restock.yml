@@ -26,6 +26,7 @@ jobs:
         env:
           IPPUDO_URL: ${{ secrets.IPPUDO_URL }}
           MATCHA_JP_URL: ${{ secrets.MATCHA_JP_URL }}
+          SAZEN_URLS:  ${{ secrets.SAZEN_URLS }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
