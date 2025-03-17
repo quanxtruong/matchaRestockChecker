@@ -9,8 +9,8 @@ import os
 
 # load_dotenv()
 
-PRODUCTS_URL = os.getenv("PRODUCTS_URL")
-# CHECK_INTERVAL = 300  # Check every 5 mins (in seconds)
+IPPUDO_URL = os.getenv("IPPUDO_URL")
+MATCHA_JP_URL = os.getenv("MATCHA_JP_URL")
 
 # Gmail SMTP settings
 SMTP_SERVER = "smtp.gmail.com" 
@@ -26,25 +26,32 @@ RECIPIENT_SMS = os.getenv("RECIPIENT_SMS")      # e.g., 1234567890@tmomail.net
 STATUS_FILE = "stock_status.json"
 
 
-def get_stock_status():
-    try:
-        response = requests.get(f"{PRODUCTS_URL}.json")
-        data = response.json()
-        stock_dict = {}
-        for product in data["products"]:
-            product_title = product["title"]
-            product_url = f"{PRODUCTS_URL}/{product['handle']}"
-            variant = product["variants"][0]
-            is_available = variant["available"]
-            stock_dict[product_title] = {
-                "available": is_available,
-                "url": product_url
-            }
-        return stock_dict
-    except Exception as e:
-        print("Error fetching stock data:", e)
-        return {}
+def process_stock(url, stock_dict):
+    response = requests.get(f"{url}.json")
+    data = response.json()
+    for product in data["products"]:
+        product_title = product["title"]
+        product_url = f"{url}/{product['handle']}"
+        variant = product["variants"][0]
+        is_available = variant["available"]
+        stock_dict[product_title] = {
+            "available": is_available,
+            "url": product_url
+        }
 
+def get_stock_status():
+    stock_dict = {}
+    try:
+        process_stock(IPPUDO_URL, stock_dict)
+    except Exception as e:
+        print("Error fetching Ippudo stock data:", e)
+
+    try:
+        process_stock(MATCHA_JP_URL, stock_dict)
+    except Exception as e:
+        print("Error fetching MatchaJP stock data:", e)
+
+    return stock_dict
 
 def load_previous_status():
     try:
