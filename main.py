@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 PRODUCTS_URL = os.getenv("PRODUCTS_URL")
-CHECK_INTERVAL = 900  # Check every 15 mins (in seconds)
+CHECK_INTERVAL = 300  # Check every 15 mins (in seconds)
 
 # Email (Gmail SMTP example)
 SMTP_SERVER = "smtp.gmail.com"
@@ -56,7 +56,7 @@ def save_status(status):
         json.dump(status, f)
 
 def send_sms_alert(product_title, product_url):
-    msg = MIMEText(f"{product_title} is BACK IN STOCK! Buy here: {product_url}\n\n")
+    msg = MIMEText(f"{product_title} is BACK IN STOCK! \n\n Buy here: {product_url}")
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = RECIPIENT_SMS
     msg["Subject"] = "Restock Alert !!!!\n\n"
