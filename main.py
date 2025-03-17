@@ -84,7 +84,7 @@ def send_email_alert(product_title, product_url):
     msg = MIMEMultipart("alternative")
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = RECIPIENT_EMAIL
-    msg["Subject"] = f"🚨 Restock Alert: {product_title} is Available!"
+    msg["Subject"] = f"🍵 Restock Alert 🍵: {product_title} is Available!"
 
     text_part = f"{product_title} is BACK IN STOCK!\nBuy here: {product_url}"
     html_part = f"""
