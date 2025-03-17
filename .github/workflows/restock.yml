@@ -24,7 +24,8 @@ jobs:
 
       - name: Run script
         env:
-          PRODUCTS_URL: ${{ secrets.PRODUCTS_URL }}
+          IPPUDO_URL: ${{ secrets.IPPUDO_URL }}
+          MATCHA_JP_URL: ${{ secrets.MATCHA_JP_URL }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
