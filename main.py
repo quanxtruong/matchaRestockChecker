@@ -7,7 +7,7 @@ import json
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# load_dotenv()
 
 PRODUCTS_URL = os.getenv("PRODUCTS_URL")
 # CHECK_INTERVAL = 300  # Check every 5 mins (in seconds)
