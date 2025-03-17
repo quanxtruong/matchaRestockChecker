@@ -20,7 +20,7 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Gmail App Password
 
 # Recipients
 RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")  # e.g., your personal email
-# RECIPIENT_SMS = os.getenv("RECIPIENT_SMS")      # e.g., 1234567890@tmomail.net
+RECIPIENT_SMS = os.getenv("RECIPIENT_SMS")      # e.g., 1234567890@tmomail.net
 
 # File to store previous stock status
 STATUS_FILE = "stock_status.json"
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
             if not prev_avail and current_avail:
                 send_email_alert(title, info["url"])
-                # send_sms_alert(title, info["url"])
+                send_sms_alert(title, info["url"])
             else:
                 print(f"{title} - In stock: {current_avail}")
 
