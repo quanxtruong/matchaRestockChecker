@@ -129,27 +129,19 @@ def send_sms_alert(product_title, product_url):
 
 # --- MAIN LOOP ---
 if __name__ == "__main__":
-    print("Starting matcha restock checker...")
     while True:
-        try:
-            current_status = get_stock_status()
-            prev_status = load_previous_status()
+        current_status = get_stock_status()
+        prev_status = load_previous_status()
 
-            for title, info in current_status.items():
-                current_avail = info["available"]
-                prev_avail = prev_status.get(title, {}).get("available", False)
+        for title, info in current_status.items():
+            current_avail = info["available"]
+            prev_avail = prev_status.get(title, {}).get("available", False)
 
-                if not prev_avail and current_avail:
-                    send_email_alert(title, info["url"])
-                    send_sms_alert(title, info["url"])
-                else:
-                    print(f"{title} - In stock: {current_avail}")
+            if not prev_avail and current_avail:
+                send_email_alert(title, info["url"])
+                send_sms_alert(title, info["url"])
+            else:
+                print(f"{title} - In stock: {current_avail}")
 
-            save_status(current_status)
-            print(f"Sleeping for {CHECK_INTERVAL} seconds...")
-            time.sleep(CHECK_INTERVAL)
-        except KeyboardInterrupt:
-            print("KeyboardInterrupt caught; continuing execution to keep instance running.")
-        except Exception as e:
-            print("An error occurred in the main loop:", e)
-            time.sleep(CHECK_INTERVAL)
+        save_status(current_status)
+        time.sleep(CHECK_INTERVAL)
