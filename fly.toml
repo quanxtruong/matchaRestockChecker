@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for matcharestockchecker on 2025-03-17T01:22:30-05:00
+# fly.toml app configuration file generated for matcharestockchecker on 2025-03-17T02:32:38-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -9,8 +9,16 @@ primary_region = 'dfw'
 [build]
 
 [processes]
-  app = "python main.py"
-  
+  app = 'python main.py'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
