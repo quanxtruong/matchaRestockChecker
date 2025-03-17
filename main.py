@@ -29,7 +29,6 @@ STATUS_FILE = "stock_status.json"
 def get_stock_status():
     try:
         response = requests.get(f"{PRODUCTS_URL}.json")
-        print("PRODUCTS_URL is:", PRODUCTS_URL)
         data = response.json()
         stock_dict = {}
         for product in data["products"]:
