@@ -134,10 +134,10 @@ def send_email_alert(product_title, product_url):
         print("Failed to send email:", e)
 
 def send_sms_alert(product_title, product_url):
-    msg = MIMEText(f"{product_title} is BACK IN STOCK!\nBuy here: {product_url}")
+    msg = MIMEText(f"{product_title} is BACK IN STOCK!\n\nBuy here: {product_url}")
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = RECIPIENT_SMS
-    msg["Subject"] = "Restock Alert"
+    msg["Subject"] = "🍵 Restock Alert 🍵\n\n"
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
