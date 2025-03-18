@@ -153,7 +153,8 @@ if __name__ == "__main__":
     try:
         current_status = get_stock_status()
         prev_status = load_previous_status()
-        print(current_status == prev_status)
+        print("Prev status loaded:", prev_status)
+        print("Current status fetched:", current_status)
         for title, info in current_status.items():
             current_avail = info["available"]
             prev_avail = prev_status.get(title, {}).get("available", False)
