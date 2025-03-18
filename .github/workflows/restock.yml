@@ -3,12 +3,11 @@ name: Matcha Restock Checker
 on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
-  workflow_dispatch:
+  workflow_dispatch:       # Allow manual runs
 
 jobs:
   check-restock:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,12 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Try download previous stock status artifact
-        continue-on-error: true  # Don't fail if not found
-        uses: actions/download-artifact@v4
+      - name: Restore stock status cache
+        uses: actions/cache@v3
         with:
-          name: stock-status
-          path: .
+          path: stock_status.json
+          key: stock-status-cache
 
       - name: Run script
         env:
@@ -42,9 +40,8 @@ jobs:
         run: |
           python main.py
 
-      - name: Upload updated stock status artifact
-        uses: actions/upload-artifact@v4
+      - name: Save stock status cache
+        uses: actions/cache@v3
         with:
-          name: stock-status
           path: stock_status.json
-          overwrite: true
+          key: stock-status-cache
