@@ -8,6 +8,7 @@ on:
 jobs:
   check-restock:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,6 +23,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Download previous stock status artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: stock-status
+          path: .
+
       - name: Run script
         env:
           IPPUDO_URL: ${{ secrets.IPPUDO_URL }}
@@ -33,3 +40,10 @@ jobs:
           RECIPIENT_SMS: ${{ secrets.RECIPIENT_SMS }}
         run: |
           python main.py
+
+      - name: Upload updated stock status artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-status
+          path: stock_status.json
+          overwrite: true
