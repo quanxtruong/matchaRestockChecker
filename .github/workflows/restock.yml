@@ -17,7 +17,6 @@ jobs:
         continue-on-error: true  # Avoid failing if artifact doesn't exist yet
         with:
           name: stock_status  # Must match the name used during upload
-          path: stock_status.json
 
       - name: Set up Python
         uses: actions/setup-python@v4
