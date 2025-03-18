@@ -29,7 +29,7 @@ def process_stock(url, stock_dict):
     data = response.json()
     for product in data["products"]:
         product_title = product["title"]
-        if product_title == "Digital Gift Card" or product_title == "Matcha To-Go Packets":
+        if product_title == "Digital Gift Card" or product_title == "Matcha To-Go Packets - 10 x 2g":
             continue
         product_url = f"{url}/{product['handle']}"
         variant = product["variants"][0]
