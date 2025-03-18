@@ -16,8 +16,8 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true  # Avoid failing if artifact doesn't exist yet
         with:
-          name: stock_status.json  # Must match the name used during upload
-          path: .
+          name: stock_status  # Must match the name used during upload
+          path: stock_status.json
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -44,5 +44,5 @@ jobs:
       - name: Upload updated stock status artifact
         uses: actions/upload-artifact@v4
         with:
-          name: stock_status.json  # Must match the download step
+          name: stock_status
           path: stock_status.json
