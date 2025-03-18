@@ -3,34 +3,23 @@ name: Matcha Restock Checker
 on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
-  workflow_dispatch:       # Allow manual runs
+  workflow_dispatch:       # Manual trigger
+
+permissions:
+  contents: write  # Required for pushing with GITHUB_TOKEN
 
 jobs:
   check-restock:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1) Ensure the file exists so hashFiles() won't fail.
-      #    If it's missing, we create an empty JSON object.
       - name: Ensure stock_status.json exists
         run: |
           if [ ! -f "stock_status.json" ]; then
             echo "{}" > stock_status.json
           fi
-
-      # 2) Restore the cached file from a previous run, if it exists.
-      #    The 'restore-keys' means if the exact hash key isn't found,
-      #    it can fall back to a more generic cache if you wish.
-      - name: Restore stock status cache
-        id: cache-restore
-        uses: actions/cache@v3
-        with:
-          path: stock_status.json
-          key: stock-status-${{ hashFiles('stock_status.json') }}
-          restore-keys: |
-            stock-status-
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -54,14 +43,28 @@ jobs:
         run: |
           python main.py
 
-      # 3) After main.py updates 'stock_status.json', re-save the cache.
-      #    This will only create a NEW cache entry if the file changed.
-      #    Otherwise, it just uses the existing one.
-      - name: Save stock status cache
-        if: always()
-        uses: actions/cache@v3
-        with:
-          path: stock_status.json
-          key: stock-status-${{ hashFiles('stock_status.json') }}
-          restore-keys: |
-            stock-status-
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Check if stock_status.json changed
+        id: status-check
+        run: |
+          git fetch origin
+          if git diff --quiet stock_status.json; then
+            echo "No changes to commit."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected."
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push updated stock_status.json
+        if: steps.status-check.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add stock_status.json
+          git commit -m "Update stock_status.json [CI auto-update]"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
