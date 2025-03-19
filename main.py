@@ -159,7 +159,7 @@ if __name__ == "__main__":
             prev_avail = prev_status.get(title, {}).get("available", False)
             if not prev_avail and current_avail:
                 send_email_alert(title, info["url"])
-                send_sms_alert(title, info["url"])
+                # send_sms_alert(title, info["url"])
             else:
                 print(f"{title} - In stock: {current_avail}")
         save_status(current_status)
